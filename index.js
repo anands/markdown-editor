@@ -15,17 +15,17 @@ emojify.setConfig({
 });
 
 var md = markdownit({
-        html: true,
-        highlight: function(code, lang) {
-            if (languageOverrides[lang]) lang = languageOverrides[lang];
-            if (lang && hljs.getLanguage(lang)) {
-                try {
-                    return hljs.highlight(lang, code).value;
-                } catch (e) {}
-            }
-            return '';
+    html: true,
+    highlight: function (code, lang) {
+        if (languageOverrides[lang]) lang = languageOverrides[lang];
+        if (lang && hljs.getLanguage(lang)) {
+            try {
+                return hljs.highlight(lang, code).value;
+            } catch (e) { }
         }
-    })
+        return '';
+    }
+})
     .use(markdownitFootnote);
 
 var hashto;
@@ -52,7 +52,7 @@ function update(e) {
 }
 
 function setOutput(val) {
-    val = val.replace(/<equation>((.*?\n)*?.*?)<\/equation>/ig, function(a, b) {
+    val = val.replace(/<equation>((.*?\n)*?.*?)<\/equation>/ig, function (a, b) {
         return '<img src="http://latex.codecogs.com/png.latex?' + encodeURIComponent(b) + '" />';
     });
 
@@ -93,11 +93,11 @@ var editor = CodeMirror.fromTextArea(document.getElementById('code'), {
 
 editor.on('change', update);
 
-function selectionChanger(selection,operator,endoperator){
-    if(selection == ""){
+function selectionChanger(selection, operator, endoperator) {
+    if (selection == "") {
         return operator;
     }
-    if(!endoperator){
+    if (!endoperator) {
         endoperator = operator
     }
     var isApplied = selection.slice(0, 2) === operator && seisAppliedection.slice(-2) === endoperator;
@@ -107,29 +107,29 @@ function selectionChanger(selection,operator,endoperator){
 
 editor.addKeyMap({
     // bold
-    'Ctrl-B': function(cm) {
-        cm.replaceSelection(selectionChanger(cm.getSelection(),'**'));
+    'Ctrl-B': function (cm) {
+        cm.replaceSelection(selectionChanger(cm.getSelection(), '**'));
     },
     // italic
-    'Ctrl-I': function(cm) {
-        cm.replaceSelection(selectionChanger(cm.getSelection(),'_'));
+    'Ctrl-I': function (cm) {
+        cm.replaceSelection(selectionChanger(cm.getSelection(), '_'));
     },
     // code
-    'Ctrl-K': function(cm) {
-        cm.replaceSelection(selectionChanger(cm.getSelection(),'`'));
+    'Ctrl-K': function (cm) {
+        cm.replaceSelection(selectionChanger(cm.getSelection(), '`'));
     },
     // keyboard shortcut
-    'Ctrl-L': function(cm) {
-        cm.replaceSelection(selectionChanger(cm.getSelection(),'<kbd>','</kbd>'));
+    'Ctrl-L': function (cm) {
+        cm.replaceSelection(selectionChanger(cm.getSelection(), '<kbd>', '</kbd>'));
     }
 });
 
-document.addEventListener('drop', function(e) {
+document.addEventListener('drop', function (e) {
     e.preventDefault();
     e.stopPropagation();
 
     var reader = new FileReader();
-    reader.onload = function(e) {
+    reader.onload = function (e) {
         editor.setValue(e.target.result);
     };
 
@@ -146,12 +146,12 @@ function saveAsHtml() {
     save(document.getElementById('out').innerHTML, document.title.replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/\s]/gi, '') + ".html");
 }
 
-document.getElementById('saveas-markdown').addEventListener('click', function() {
+document.getElementById('saveas-markdown').addEventListener('click', function () {
     saveAsMarkdown();
     hideMenu();
 });
 
-document.getElementById('saveas-html').addEventListener('click', function() {
+document.getElementById('saveas-html').addEventListener('click', function () {
     saveAsHtml();
     hideMenu();
 });
@@ -193,7 +193,7 @@ function openFile(evt) {
         var files = evt.target.files;
         console.log(files);
         var reader = new FileReader();
-        reader.onload = function(file) {
+        reader.onload = function (file) {
             console.log(file.target.result);
             editor.setValue(file.target.result);
             return true;
@@ -205,13 +205,13 @@ function openFile(evt) {
     }
 }
 
-document.getElementById('close-menu').addEventListener('click', function() {
+document.getElementById('close-menu').addEventListener('click', function () {
     hideMenu();
 });
 
-document.addEventListener('keydown', function(e) {
+document.addEventListener('keydown', function (e) {
     if (e.keyCode == 83 && (e.ctrlKey || e.metaKey)) {
-        if ( localStorage.getItem('content') == editor.getValue() ) {
+        if (localStorage.getItem('content') == editor.getValue()) {
             e.preventDefault();
             return false;
         }
@@ -235,24 +235,12 @@ function clearEditor() {
 
 function saveInBrowser() {
     var text = editor.getValue();
-    if (localStorage.getItem('content')) {
-        swal({
-                title: "Existing Data Detected",
-                text: "You will overwrite the data previously saved!",
-                type: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#DD6B55",
-                confirmButtonText: "Yes, overwrite!",
-                closeOnConfirm: false
-            },
-            function() {
-                localStorage.setItem('content', text);
-                swal("Saved", "Your Document has been saved.", "success");
-            });
-    } else {
-        localStorage.setItem('content', text);
-        swal("Saved", "Your Document has been saved.", "success");
-    }
+    localStorage.setItem('content', text);
+    const title = document.title;
+    document.title = "Saved...";
+    setTimeout(() => {
+        document.title = title;
+    }, 1200);
     console.log("Saved");
 }
 
@@ -284,7 +272,7 @@ function processQueryParams() {
     }
     if (params) {
         var obj = {};
-        params.split('&').forEach(function(elem) {
+        params.split('&').forEach(function (elem) {
             obj[elem.split('=')[0]] = elem.split('=')[1];
         });
         if (obj.reading === 'false') {
